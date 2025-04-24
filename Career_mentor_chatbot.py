@@ -1,30 +1,29 @@
+import os
 import streamlit as st
 from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationChain
-from langchain.memory import ConversationBufferMemory
-import os
 
-os.environ["OPENAI_API_KEY"] = "your-openai-api-key-here"
+# Get the API key from environment variables
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
-st.set_page_config(page_title="AI Career Mentor", page_icon="🎓")
-st.title("🎓 AI Career Mentor Chatbot")
-st.write("Ask me anything about careers, job roles, skills, and learning paths!")
+# Streamlit app title
+st.title("Career Mentor Chatbot")
 
-llm = ChatOpenAI(temperature=0.7)
-memory = ConversationBufferMemory()
-conversation = ConversationChain(llm=llm, memory=memory, verbose=False)
+if not openai_api_key or not openai_api_key.startswith("sk-"):
+    st.error("The API key is invalid or not set. Please check your environment variable.")
+    st.stop()
 
-user_input = st.text_input("👤 You:", placeholder="What career suits me if I love math and tech?")
+# Initialize the ChatOpenAI model
+llm = ChatOpenAI(temperature=0.7, openai_api_key=openai_api_key)
 
+# Input from the user
+user_input = st.text_input("Ask your career-related question:")
+
+# Process the input and generate a response
 if user_input:
-    with st.spinner("Thinking..."):
-        response = conversation.predict(input=user_input)
-    st.markdown(f"**🤖 AI Mentor:** {response}")
-
-if st.checkbox("Show chat history"):
-    st.markdown("### 💬 Previous Conversation")
-    for i, msg in enumerate(memory.chat_memory.messages):
-        if i % 2 == 0:
-            st.markdown(f"**You:** {msg.content}")
-        else:
-            st.markdown(f"**AI:** {msg.content}")
+    try:
+        # Pass the input as the 'text' argument
+        response = llm.predict(text=user_input)
+        st.write("Chatbot Response:")
+        st.write(response)
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
