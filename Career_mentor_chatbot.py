@@ -1,6 +1,7 @@
+# filepath: /home/chhunchhun/ai-career-mentor/Career_mentor_chatbot.py
 import os
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatOpenAI  # Corrected import
 
 # Streamlit app title
 st.title("Career Mentor Chatbot")
